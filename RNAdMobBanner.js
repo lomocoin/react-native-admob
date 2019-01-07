@@ -1,20 +1,27 @@
-import React from 'react';
+import React from "react";
 import {
   NativeModules,
   requireNativeComponent,
   View,
-  NativeEventEmitter,
-} from 'react-native';
+  NativeEventEmitter
+} from "react-native";
+import PropTypes from "prop-types";
 
-const RNBanner = requireNativeComponent('RNAdMob', AdMobBanner);
+const RNBanner = requireNativeComponent("RNAdMob", AdMobBanner);
 
 export default class AdMobBanner extends React.Component {
+  static defaultProps = {
+    width: 0,
+    height: 0,
+    bannerSize: "smartBannerPortrait",
+    didFailToReceiveAdWithError: () => {}
+  };
 
   constructor() {
     super();
     this.onSizeChange = this.onSizeChange.bind(this);
     this.state = {
-      style: {},
+      style: {}
     };
   }
 
@@ -24,28 +31,41 @@ export default class AdMobBanner extends React.Component {
   }
 
   render() {
-    const { adUnitID, testDeviceID, bannerSize, style, didFailToReceiveAdWithError } = this.props;
+    const {
+      adUnitID,
+      testDeviceID,
+      bannerSize,
+      style,
+      didFailToReceiveAdWithError,
+      width,
+      height
+    } = this.props;
     return (
       <View style={this.props.style}>
         <RNBanner
           style={this.state.style}
           onSizeChange={this.onSizeChange.bind(this)}
           onAdViewDidReceiveAd={this.props.adViewDidReceiveAd}
-          onDidFailToReceiveAdWithError={(event) => didFailToReceiveAdWithError(event.nativeEvent.error)}
+          onDidFailToReceiveAdWithError={event =>
+            didFailToReceiveAdWithError(event.nativeEvent.error)
+          }
           onAdViewWillPresentScreen={this.props.adViewWillPresentScreen}
           onAdViewWillDismissScreen={this.props.adViewWillDismissScreen}
           onAdViewDidDismissScreen={this.props.adViewDidDismissScreen}
           onAdViewWillLeaveApplication={this.props.adViewWillLeaveApplication}
           testDeviceID={testDeviceID}
           adUnitID={adUnitID}
-          bannerSize={bannerSize} />
+          bannerSize={bannerSize}
+          width={width}
+          height={height}
+        />
       </View>
     );
   }
 }
 
 AdMobBanner.propTypes = {
-  style: View.propTypes.style,
+  style: PropTypes.style,
 
   /**
    * AdMob iOS library banner size constants
@@ -57,31 +77,40 @@ AdMobBanner.propTypes = {
    * leaderboard (728x90, IAB Leaderboard for Tablets)
    * smartBannerPortrait (Screen width x 32|50|90, Smart Banner for Phones and Tablets)
    * smartBannerLandscape (Screen width x 32|50|90, Smart Banner for Phones and Tablets)
+   * smartBanner (custom size, need set width and height)
    *
    * banner is default
    */
-  bannerSize: React.PropTypes.string,
+  bannerSize: PropTypes.string,
+
+  /**
+   * when banner size is smartBanner, need set width and height
+   */
+  width: PropTypes.number,
+
+  /**
+   * when banner size is smartBanner, need set width and height
+   */
+  height: PropTypes.number,
 
   /**
    * AdMob ad unit ID
    */
-  adUnitID: React.PropTypes.string,
+  adUnitID: PropTypes.string,
 
   /**
    * Test device ID
    */
-  testDeviceID: React.PropTypes.string,
+  testDeviceID: PropTypes.string,
 
   /**
    * AdMob iOS library events
    */
-  adViewDidReceiveAd: React.PropTypes.func,
-  didFailToReceiveAdWithError: React.PropTypes.func,
-  adViewWillPresentScreen: React.PropTypes.func,
-  adViewWillDismissScreen: React.PropTypes.func,
-  adViewDidDismissScreen: React.PropTypes.func,
-  adViewWillLeaveApplication: React.PropTypes.func,
-  ...View.propTypes,
+  adViewDidReceiveAd: PropTypes.func,
+  didFailToReceiveAdWithError: PropTypes.func,
+  adViewWillPresentScreen: PropTypes.func,
+  adViewWillDismissScreen: PropTypes.func,
+  adViewDidDismissScreen: PropTypes.func,
+  adViewWillLeaveApplication: PropTypes.func,
+  ...View.propTypes
 };
-
-AdMobBanner.defaultProps = { bannerSize: 'smartBannerPortrait', didFailToReceiveAdWithError: () => {} };
