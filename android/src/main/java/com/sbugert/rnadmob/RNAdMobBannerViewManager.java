@@ -1,6 +1,7 @@
 package com.sbugert.rnadmob;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View.OnLayoutChangeListener;
 import android.view.View;
 
@@ -25,10 +26,14 @@ public class RNAdMobBannerViewManager extends SimpleViewManager<ReactViewGroup> 
   public static final String REACT_CLASS = "RNAdMob";
 
   public static final String PROP_BANNER_SIZE = "bannerSize";
+  public static final String PROP_BANNER_WIDTH = "width";
+  public static final String PROP_BANNER_HEIGHT = "height";
   public static final String PROP_AD_UNIT_ID = "adUnitID";
   public static final String PROP_TEST_DEVICE_ID = "testDeviceID";
 
   private String testDeviceID = null;
+  private int width = 0;
+  private int height = 0;
 
   public enum Events {
     EVENT_SIZE_CHANGE("onSizeChange"),
@@ -54,7 +59,7 @@ public class RNAdMobBannerViewManager extends SimpleViewManager<ReactViewGroup> 
   private ThemedReactContext mThemedReactContext;
   private RCTEventEmitter mEventEmitter;
   private ReactViewGroup mView;
-  private String mSizeString;
+  private String mSizeString = "";
 
   @Override
   public String getName() {
@@ -153,9 +158,29 @@ public class RNAdMobBannerViewManager extends SimpleViewManager<ReactViewGroup> 
   }
 
   @ReactProp(name = PROP_BANNER_SIZE)
-  public void setBannerSize(final ReactViewGroup view, final String sizeString) {
-    mSizeString = sizeString;
-    AdSize adSize = getAdSizeFromString(sizeString);
+  public void setBannerSize(ReactViewGroup view, String sizeString) {
+    if (!this.mSizeString.equals(sizeString)) {
+      isSuccess = false;
+    }
+    this.mSizeString = sizeString;
+    loadBannerSize(view);
+  }
+
+  @ReactProp(name = PROP_BANNER_WIDTH)
+  public void setBannerWidth(ReactViewGroup view, int width) {
+    this.width = width;
+  }
+
+  @ReactProp(name = PROP_BANNER_HEIGHT)
+  public void setBannerHeight(ReactViewGroup view, int height) {
+    this.height = height;
+  }
+
+  private void loadBannerSize(final ReactViewGroup view) {
+    AdSize adSize = getAdSizeFromString(mSizeString);
+    if (adSize == null) {
+      return;
+    }
 
     // store old ad unit ID (even if not yet present and thus null)
     AdView oldAdView = (AdView) view.getChildAt(0);
@@ -173,8 +198,7 @@ public class RNAdMobBannerViewManager extends SimpleViewManager<ReactViewGroup> 
     if (adSize == AdSize.SMART_BANNER) {
       width = (int) PixelUtil.toDIPFromPixel(adSize.getWidthInPixels(mThemedReactContext));
       height = (int) PixelUtil.toDIPFromPixel(adSize.getHeightInPixels(mThemedReactContext));
-    }
-    else {
+    } else {
       width = adSize.getWidth();
       height = adSize.getHeight();
     }
@@ -206,7 +230,7 @@ public class RNAdMobBannerViewManager extends SimpleViewManager<ReactViewGroup> 
   private void loadAd(final AdView adView) {
     if (adView.getAdSize() != null && adView.getAdUnitId() != null) {
       AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
-      if (testDeviceID != null){
+      if (testDeviceID != null) {
         if (testDeviceID.equals("EMULATOR")) {
           adRequestBuilder = adRequestBuilder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         } else {
@@ -218,8 +242,20 @@ public class RNAdMobBannerViewManager extends SimpleViewManager<ReactViewGroup> 
     }
   }
 
+  boolean isSuccess = false;
 
   private AdSize getAdSizeFromString(String adSize) {
+    // custom banner need check width and height
+    if (adSize.equals("customBanner")) {
+      if (width > 0 && height > 0) {
+        return new AdSize(width, height);
+      }
+      return null;
+    }
+    if (isSuccess) {
+      return null;
+    }
+    isSuccess = true;
     switch (adSize) {
       case "banner":
         return AdSize.BANNER;
