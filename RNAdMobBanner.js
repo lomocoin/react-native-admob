@@ -77,19 +77,19 @@ AdMobBanner.propTypes = {
    * leaderboard (728x90, IAB Leaderboard for Tablets)
    * smartBannerPortrait (Screen width x 32|50|90, Smart Banner for Phones and Tablets)
    * smartBannerLandscape (Screen width x 32|50|90, Smart Banner for Phones and Tablets)
-   * smartBanner (custom size, need set width and height)
+   * customBanner (custom size, need set width and height)
    *
    * banner is default
    */
   bannerSize: PropTypes.string,
 
   /**
-   * when banner size is smartBanner, need set width and height
+   * when banner size is customBanner, need set width and height
    */
   width: PropTypes.number,
 
   /**
-   * when banner size is smartBanner, need set width and height
+   * when banner size is customBanner, need set width and height
    */
   height: PropTypes.number,
 

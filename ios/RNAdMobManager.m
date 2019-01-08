@@ -15,15 +15,16 @@ RCT_EXPORT_MODULE();
 
 - (UIView *)view
 {
-  return [[BannerView alloc] init];
+    return [[BannerView alloc] init];
 }
 
 - (dispatch_queue_t)methodQueue
 {
-  return dispatch_get_main_queue();
+    return dispatch_get_main_queue();
 }
 
-
+RCT_EXPORT_VIEW_PROPERTY(width, float);
+RCT_EXPORT_VIEW_PROPERTY(height, float);
 RCT_EXPORT_VIEW_PROPERTY(bannerSize, NSString);
 RCT_EXPORT_VIEW_PROPERTY(adUnitID, NSString);
 RCT_EXPORT_VIEW_PROPERTY(testDeviceID, NSString);

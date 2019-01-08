@@ -10,6 +10,8 @@
 
 @interface BannerView : UIView <GADBannerViewDelegate>
 
+@property (nonatomic, assign) float width;
+@property (nonatomic, assign) float height;
 @property (nonatomic, copy) NSString *bannerSize;
 @property (nonatomic, copy) NSString *adUnitID;
 @property (nonatomic, copy) NSString *testDeviceID;
